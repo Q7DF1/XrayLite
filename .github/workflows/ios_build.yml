@@ -25,16 +25,12 @@ jobs:
       - name: Prepare Assets
         run: |
           # 确保有 assets 目录并下载必要的资源文件
-          mkdir -p assets
           chmod +x gen_assets.sh
           # 运行项目自带的下载脚本
           ./gen_assets.sh download
-          # 检查下载结果并移动到 assets 目录（gomobile 会自动打包该目录下的文件）
-          if [ -d "data" ]; then
-            mv data/*.dat assets/ || true
-          fi
 
       - name: Build iOS XCFramework
+
         run: |
           # 整理依赖
           go mod tidy

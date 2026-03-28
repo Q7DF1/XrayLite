@@ -9,26 +9,42 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 __base="$(basename "${__file}" .sh)"
 
-DATADIR="${__dir}/data"
+DATADIR="${__dir}/assets"
 
 
 # Check for required dependencies
 check_dependencies() {
-    command -v jq >/dev/null 2>&1 || { echo >&2 "jq is required but it's not installed. Aborting."; exit 1; }
     command -v go >/dev/null 2>&1 || { echo >&2 "Go is required but it's not installed. Aborting."; exit 1; }
 }
 
 
 # Download data function
 download_dat() {
-    echo "Downloading geoip.dat..."
-    curl -sL https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -o "$DATADIR/geoip.dat"
+    mkdir -p "$DATADIR"
 
-    echo "Downloading geosite.dat..."
-    curl -sL https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -o "$DATADIR/geosite.dat"
+    # Download geoip.dat
+    if [ ! -f "$DATADIR/geoip.dat" ]; then
+        echo "Downloading geoip.dat..."
+        curl -sL https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -o "$DATADIR/geoip.dat"
+    else
+        echo "geoip.dat already exists in $DATADIR, skipping download."
+    fi
 
-    echo "Downloading geoip-only-cn-private.dat..."
-    curl -sL https://raw.githubusercontent.com/Loyalsoldier/geoip/release/geoip-only-cn-private.dat -o "$DATADIR/geoip-only-cn-private.dat"
+    # Download geosite.dat
+    if [ ! -f "$DATADIR/geosite.dat" ]; then
+        echo "Downloading geosite.dat..."
+        curl -sL https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -o "$DATADIR/geosite.dat"
+    else
+        echo "geosite.dat already exists in $DATADIR, skipping download."
+    fi
+
+    # Download geoip-only-cn-private.dat
+    if [ ! -f "$DATADIR/geoip-only-cn-private.dat" ]; then
+        echo "Downloading geoip-only-cn-private.dat..."
+        curl -sL https://raw.githubusercontent.com/Loyalsoldier/geoip/release/geoip-only-cn-private.dat -o "$DATADIR/geoip-only-cn-private.dat"
+    else
+        echo "geoip-only-cn-private.dat already exists in $DATADIR, skipping download."
+    fi
 }
 
 # Main execution logic

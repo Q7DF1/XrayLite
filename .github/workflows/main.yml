@@ -46,9 +46,8 @@ jobs:
 
     - name: Build
       run: |
-         mkdir -p assets data
-         bash gen_assets.sh download
-         cp -v data/*.dat assets/
+         chmod +x gen_assets.sh
+         ./gen_assets.sh download
          gomobile init
          go mod tidy
          gomobile bind -v -androidapi 24 -trimpath -ldflags='-s -w -buildid=' ./

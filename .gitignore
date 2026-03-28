@@ -14,7 +14,7 @@ conf/demo/
 demo/
 
 # Ignore asset files
-assets/
+# assets/
 
 # Ignore V2Ray library files
 libv2ray*.[a|j]ar
