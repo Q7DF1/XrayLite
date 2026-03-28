@@ -1,0 +1,49 @@
+name: Build iOS XCFramework
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # 允许手动运行
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Install gomobile
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          gomobile init
+
+      - name: Prepare Assets
+        run: |
+          # 确保有 assets 目录并下载必要的资源文件
+          mkdir -p assets
+          chmod +x gen_assets.sh
+          # 运行项目自带的下载脚本
+          ./gen_assets.sh download
+          # 检查下载结果并移动到 assets 目录（gomobile 会自动打包该目录下的文件）
+          if [ -d "data" ]; then
+            mv data/*.dat assets/ || true
+          fi
+
+      - name: Build iOS XCFramework
+        run: |
+          # 整理依赖
+          go mod tidy
+          # 编译 xcframework 格式（支持真机和模拟器）
+          # 输出文件名为 Libv2ray.xcframework
+          gomobile bind -v -target=ios -ldflags="-s -w" -o Libv2ray.xcframework ./
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Libv2ray.xcframework
+          path: Libv2ray.xcframework
